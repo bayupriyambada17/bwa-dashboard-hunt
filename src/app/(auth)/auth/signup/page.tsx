@@ -29,22 +29,21 @@ const SignUpPage: FC<SignUpPageProps> = ({ }) => {
   const { toast } = useToast();
 
   const onSubmit = async (val: z.infer<typeof signUpFormSchema>) => {
-    // try {
-    //   await fetch("/api/company/new-user", {
-    //     method: "POST",
-    //     headers: { "Content-Type": "application/json" },
-    //     body: JSON.stringify(val),
-    //   });
+    try {
+      await fetch("/api/company/new-user", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(val),
+      });
 
-    //   await router.push("/auth/signin");
-    // } catch (error) {
-    //   toast({
-    //     title: "Error",
-    //     description: "Please Try Again",
-    //   });
-    //   console.log(error);
-    // }
-    console.log(val);
+      await router.push("/auth/signin");
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Please Try Again",
+      });
+      console.log(error);
+    }
   };
 
   return (
