@@ -15,7 +15,7 @@ import Link from "next/link";
 import React, { FC } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-// import { signIn } from "next-auth/react";
+import { signIn } from "next-auth/react";
 import { useToast } from "@/components/ui/use-toast";
 import { useRouter } from "next/navigation";
 
@@ -26,26 +26,27 @@ const SignInPage: FC<SignInPageProps> = ({ }) => {
     resolver: zodResolver(signInFormSchema),
   });
 
-  // const { toast } = useToast();
+  const { toast } = useToast();
 
   const router = useRouter();
 
   const onSubmit = async (val: z.infer<typeof signInFormSchema>) => {
-    // const authenticated = await signIn("credentials", {
-    //   ...val,
-    //   redirect: false,
-    // });
+    const authenticated = await signIn("credentials", {
+      ...val,
+      redirect: false,
+    });
+    console.log(authenticated)
 
-    // if (authenticated?.error) {
-    //   toast({
-    //     title: "Error",
-    //     description: "Email or Password maybe wrong",
-    //   });
+    if (authenticated?.error) {
+      toast({
+        title: "Error",
+        description: "Email or Password maybe wrong",
+      });
 
-    //   return;
-    // }
+      return;
+    }
 
-    // await router.push("/");
+    await router.push("/");
   };
 
   return (
