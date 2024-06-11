@@ -11,7 +11,7 @@ import { ArrowLeft } from "lucide-react";
 import React, { FC, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import { JOBTYPES } from "../../constants";
+import { JOBTYPES } from "@/constants";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { SelectLabel } from "@radix-ui/react-select";
 import InputSkills from "@/components/layouts/organisms/InputSkills";
@@ -20,9 +20,21 @@ import InputBenefits from "@/components/layouts/organisms/InputBenefits";
 import { Button } from "@/components/ui/button";
 import TitleForm from "@/components/atoms/TitleForm";
 
+
+import useSWR from 'swr';
+import { fetcher } from "@/lib/utils";
+import { CategoryJob } from "@prisma/client";
+import { useSession } from "next-auth/react";
+import moment from "moment";
+import { useRouter } from "next/navigation";
+import { useToast } from "@/components/ui/use-toast";
+
 interface PostJobPageProps { }
 
 const PostJobPage: FC<PostJobPageProps> = ({ }) => {
+  const { data, error, isLoading } = useSWR<CategoryJob[]>('/api/job/categories', fetcher);
+
+  const { data: session } = useSession();
   const [editorLoaded, setEditorLoaded] = useState<boolean>(false);
 
   const form = useForm<z.infer<typeof jobFormSchema>>({
@@ -31,8 +43,43 @@ const PostJobPage: FC<PostJobPageProps> = ({ }) => {
       requiredSkills: []
     },
   })
-  const onSubmit = (val: z.infer<typeof jobFormSchema>) => {
-    console.log(val);
+
+  const router = useRouter();
+  const { toast } = useToast();
+  const onSubmit = async (val: z.infer<typeof jobFormSchema>) => {
+    try {
+      const body: any = {
+        applicants: 0,
+        benefits: val.benefits,
+        categoryId: val.categoryId,
+        companyId: session?.user.id!!,
+        datePosted: moment().toDate(),
+        description: val.jobDescription,
+        dueDate: moment().add(1, "M").toDate(),
+        jobType: val.jobType,
+        needs: 20,
+        niceToHaves: val.niceToHaves,
+        requiredSkills: val.requiredSkills,
+        responsibility: val.responsibility,
+        roles: val.roles,
+        salaryFrom: val.salaryFrom,
+        salaryTo: val.salaryTo,
+        whoYouAre: val.whoYouAre
+      }
+
+      await fetch('/api/job', {
+        method: 'POST',
+        headers: { "Content-Type": "applications/json" },
+        body: JSON.stringify(body)
+      });
+      await router.push('/job-listings');
+    } catch {
+      toast({
+        title: 'Error',
+        description: 'Please try again'
+      })
+      console.log(error);
+    }
   }
 
   useEffect(() => {
@@ -143,12 +190,11 @@ const PostJobPage: FC<PostJobPageProps> = ({ }) => {
                     </FormControl>
                     <SelectContent >
                       <SelectGroup >
-                        <SelectItem value="est">Eastern Standard Time (EST)</SelectItem>
-                        <SelectItem value="cst">Central Standard Time (CST)</SelectItem>
-                        <SelectItem value="mst">Mountain Standard Time (MST)</SelectItem>
-                        <SelectItem value="pst">Pacific Standard Time (PST)</SelectItem>
-                        <SelectItem value="akst">Alaska Standard Time (AKST)</SelectItem>
-                        <SelectItem value="hst">Hawaii Standard Time (HST)</SelectItem>
+                        {data?.map((item: any) => (
+                          <SelectItem key={item.id} value={item.id}>
+                            {item.name}
+                          </SelectItem>
+                        ))}
                       </SelectGroup>
                     </SelectContent>
                   </Select>

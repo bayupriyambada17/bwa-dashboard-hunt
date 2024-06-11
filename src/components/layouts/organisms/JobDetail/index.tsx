@@ -1,14 +1,20 @@
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Separator } from '@/components/ui/separator';
-import { PartyPopper } from 'lucide-react';
+import { dateFormat } from '@/lib/utils';
+import { CategoryJob, Job } from '@prisma/client';
+import { PartyPopperIcon } from 'lucide-react';
 import React, { FC } from 'react'
 
+type jobDetailType = {
+  CategoryJob: CategoryJob | null;
+} & Job
 interface JobDetailProps {
-
+  detail: jobDetailType | null;
 }
 
-const JobDetail: FC<JobDetailProps> = ({ }) => {
+const JobDetail: FC<JobDetailProps> = ({ detail }) => {
+  const benefits: any = detail?.benefits;
   return (
     <div>
       <div className='grid grid-cols-3 w-full gap-5'>
@@ -17,40 +23,29 @@ const JobDetail: FC<JobDetailProps> = ({ }) => {
             <div className='text-3xl font-semibold'>
               Job Description
             </div>
-            <div className='text-gray-500 mt-2'>
-              <p className='text-sm'>
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
-              </p>
+            <div className='text-gray-500 mt-2' dangerouslySetInnerHTML={{ __html: detail?.description!! }}>
             </div>
           </div>
           <div>
             <div className='text-3xl font-semibold'>
               Responsibility
             </div>
-            <div className='text-gray-500 mt-2'>
-              <p className='text-sm'>
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
-              </p>
+            <div className='text-gray-500 mt-2' dangerouslySetInnerHTML={{ __html: detail?.responsibility!! }}>
+
             </div>
           </div>
           <div>
             <div className='text-3xl font-semibold'>
               Who You Are
             </div>
-            <div className='text-gray-500 mt-2'>
-              <p>
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
-              </p>
+            <div className='text-gray-500 mt-2' dangerouslySetInnerHTML={{ __html: detail?.whoYouAre!! }}>
             </div>
           </div>
           <div>
             <div className='text-3xl font-semibold'>
               Nice To Have
             </div>
-            <div className='text-gray-500 mt-2'>
-              <p>
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
-              </p>
+            <div className='text-gray-500 mt-2' dangerouslySetInnerHTML={{ __html: detail?.niceToHaves!! }}>
             </div>
           </div>
         </div>
@@ -59,8 +54,8 @@ const JobDetail: FC<JobDetailProps> = ({ }) => {
             About this Role
           </div>
           <div className='bg-gray-100 p-3 text-center mt-4'>
-            1 <span className='text-gray-500'>of 10 capacity </span>
-            <Progress className='mt-3' value={10} />
+            {detail?.applicants} <span className='text-gray-500'>of {detail?.needs} capacity </span>
+            <Progress className='mt-3' value={(detail?.applicants || 0) / (detail?.needs || 0) / 100} />
           </div>
           <div className='mb-10 space-y-5 mt-4'>
             <div className='flex justify-between'>
@@ -68,7 +63,7 @@ const JobDetail: FC<JobDetailProps> = ({ }) => {
                 Apply Before
               </div>
               <div className='font-semibold'>
-                12 Aug 2023
+                {dateFormat(detail?.dueDate)}
               </div>
             </div>
             <div className='flex justify-between'>
@@ -76,7 +71,7 @@ const JobDetail: FC<JobDetailProps> = ({ }) => {
                 Job Posted On
               </div>
               <div className='font-semibold'>
-                12 Aug 2023
+                {dateFormat(detail?.datePosted)}
               </div>
             </div>
             <div className='flex justify-between'>
@@ -84,7 +79,7 @@ const JobDetail: FC<JobDetailProps> = ({ }) => {
                 Job Type
               </div>
               <div className='font-semibold'>
-                Full-Time
+                {detail?.jobType}
               </div>
             </div>
             <div className='flex justify-between'>
@@ -92,7 +87,7 @@ const JobDetail: FC<JobDetailProps> = ({ }) => {
                 Salary
               </div>
               <div className='font-semibold'>
-                $100 - $1000 USD
+                ${detail?.salaryFrom} - ${detail?.salaryTo}
               </div>
             </div>
           </div>
@@ -104,7 +99,7 @@ const JobDetail: FC<JobDetailProps> = ({ }) => {
               Category
             </div>
             <div className='space-x-5'>
-              <Badge>Design</Badge>
+              <Badge>{detail?.CategoryJob?.name}</Badge>
             </div>
           </div>
           <div className='my-10'>
@@ -112,7 +107,7 @@ const JobDetail: FC<JobDetailProps> = ({ }) => {
               Required Skills
             </div>
             <div className='space-x-5'>
-              {['HTML', 'CSS', 'JS'].map(
+              {detail?.requiredSkills.map(
                 (item, i) => (
                   <Badge key={item + i}>{item}</Badge>
                 )
@@ -129,14 +124,14 @@ const JobDetail: FC<JobDetailProps> = ({ }) => {
           This job comes with several perks and benefits
         </div>
         <div className='grid grid-cols-4 gap-5 mt-9'>
-          {[0, 1, 2].map((item: number) => (
-            <div className="" key={item + 1}>
-              <PartyPopper className='w-10 h-10 text-primary mb-6' />
+          {benefits.map((item: any) => (
+            <div key={item + 1}>
+              <PartyPopperIcon className='w-10 h-10 text-primary mb-6' />
               <div className='text-lg font-semibold mb-3'>
-                Full HealthCare
+                {item.benefit}
               </div>
               <div className='text-gray-500'>
-                Lorem ipsum dolor sit, amet consectetur adipisicing elit. Dolore, expedita.
+                {item.description}
               </div>
             </div>
           ))}

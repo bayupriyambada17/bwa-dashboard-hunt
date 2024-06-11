@@ -11,6 +11,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { useToast } from "@/components/ui/use-toast";
 import { PlusIcon } from "lucide-react";
 import React, { useRef } from "react";
 
@@ -21,6 +22,8 @@ interface Props {
 export default function DialogAddBenefit({ updateBenefits }: Props) {
 	const benefitRef = useRef<HTMLInputElement>(null);
 	const descriptionRef = useRef<HTMLTextAreaElement>(null);
+
+	const { toast } = useToast();
 
 	const handleSaveBenefit = () => {
 		const benefit = benefitRef.current?.value;
@@ -34,6 +37,13 @@ export default function DialogAddBenefit({ updateBenefits }: Props) {
 			benefit,
 			description,
 		});
+
+		toast({
+			description: "Benefit added successfully",
+		});
+
+		if (benefitRef?.current) benefitRef.current.value = "";
+		if (descriptionRef?.current) descriptionRef.current.value = "";
 	};
 
 	return (

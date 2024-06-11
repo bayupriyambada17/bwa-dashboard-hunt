@@ -3,6 +3,7 @@ import { EnumValues } from "zod";
 export const JOBTYPES: EnumValues = ['Full-Time', 'Part-Time', 'Remote', 'Internship'];
 
 export const JOB_LISTING_COLUMNS: string[] = [
+	"No",
 	"Roles",
 	"Status",
 	"Date Posted",

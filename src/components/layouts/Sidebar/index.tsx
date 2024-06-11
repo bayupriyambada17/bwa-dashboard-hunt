@@ -1,6 +1,8 @@
 "use client"
 import { Button } from '@/components/ui/button';
+import { Sign } from 'crypto';
 import { Building2, CalendarDaysIcon, Cog, Files, Home, LogOut, MessageCircle, UserCheck2 } from 'lucide-react';
+import { signOut } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import React, { FC, useEffect, useState } from 'react';
 
@@ -68,7 +70,7 @@ const Sidebar: FC<SidebarProps> = ({ }) => {
               <Cog className='mr-2 h-4 w-4' />
               Settings
             </Button>
-            <Button onClick={() => handleNavigation('/logout')} variant={'ghost'} className='w-full justify-start rounded-md text-red-400 hover:text-red-500'>
+            <Button onClick={() => signOut()} variant={'ghost'} className='w-full justify-start rounded-md text-red-400 hover:text-red-500'>
               <LogOut className='mr-2 h-4 w-4' />
               Logout
             </Button>

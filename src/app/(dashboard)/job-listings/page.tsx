@@ -1,6 +1,6 @@
 import { FC } from "react";
 
-// import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { Badge } from "@/components/ui/badge";
 import {
   Table,
@@ -11,33 +11,32 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { JOB_LISTING_COLUMNS, JOB_LISTING_DATA } from "@/constants";
-// import { dateFormat } from "@/lib/utils";
-// import { Job } from "@prisma/client";
 import moment from "moment";
 import ButtonActionTable from "@/components/layouts/organisms/ButtonActionTable";
-// import { getServerSession } from "next-auth";
-// import prisma from "../../../../lib/prisma";
+import { getServerSession } from "next-auth";
+import prisma from "../../../../lib/prisma";
+import { Job } from "@prisma/client";
+import { dateFormat } from "@/lib/utils";
 
 interface JobListingsPageProps { }
 
 export const revalidate = 0;
 
-// async function getDataJobs() {
-//   // const session = await getServerSession(authOptions);
+async function getDataJobs() {
+  const session = await getServerSession(authOptions);
 
-//   const jobs = prisma.job.findMany({
-//     where: {
-//       companyId: session?.user.id,
-//     },
-//   });
+  const jobs = prisma.job.findMany({
+    where: {
+      companyId: session?.user.id,
+    },
+  });
 
-//   return jobs;
-// }
+  return jobs;
+}
 
 const JobListingsPage: FC<JobListingsPageProps> = async ({ }) => {
-  // const jobs = await getDataJobs();
-
-  // console.log(jobs);
+  const jobs = await getDataJobs();
+  console.log(jobs);
 
   return (
     <div>
@@ -56,8 +55,9 @@ const JobListingsPage: FC<JobListingsPageProps> = async ({ }) => {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {JOB_LISTING_DATA.map((item: any, i: number) => (
+            {jobs.map((item: Job, i: number) => (
               <TableRow key={item.roles + i}>
+                <TableCell>{i + 1}</TableCell>
                 <TableCell>{item.roles}</TableCell>
                 <TableCell>
                   {moment(item.datePosted).isBefore(
@@ -71,11 +71,10 @@ const JobListingsPage: FC<JobListingsPageProps> = async ({ }) => {
                   )}
                 </TableCell>
                 <TableCell>
-                  {item.datePosted}
-                  {/* {dateFormat(item.datePosted)} */}
+                  {dateFormat(item.datePosted)}
                 </TableCell>
                 <TableCell>
-                  {item.dueDate}
+                  {dateFormat(item.dueDate)}
                 </TableCell>
                 <TableCell>
                   <Badge variant="outline">
