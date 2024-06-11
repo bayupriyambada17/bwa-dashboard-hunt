@@ -38,7 +38,12 @@ const InputSkills: FC<InputSkillsProps> = ({ form, name, label }) => {
     const newValue: any = [...values, value];
     setValues(newValue);
     form.setValue(name, newValue);
+
+    // clear text after save
+    if (inputRef?.current) inputRef.current.value = '';
   }
+
+
 
   const handleDeleteValue = (item: string) => {
     const skills: any = values.filter((value: string) => item !== value);
@@ -46,10 +51,10 @@ const InputSkills: FC<InputSkillsProps> = ({ form, name, label }) => {
     form.setValue(name, skills);
   }
 
-  // useEffect(() => {
-  //   const val = form.getValues(name);
-  //   if (val && val.length > 0) setValues(val);
-  // }, [form, name]);
+  useEffect(() => {
+    const val = form.getValues(name);
+    if (val && val.length > 0) setValues(val);
+  }, [form, name]);
 
 
   return (

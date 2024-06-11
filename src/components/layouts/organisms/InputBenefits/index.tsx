@@ -2,6 +2,7 @@ import React, { FC, useState } from "react";
 import DialogAddBenefit from "./DialogAddBenefit";
 import { FormField, FormItem, FormMessage } from "@/components/ui/form";
 import { PartyPopper, X } from "lucide-react";
+import { useToast } from "@/components/ui/use-toast";
 
 interface InputBenefitsProps {
   form: any;
@@ -9,6 +10,7 @@ interface InputBenefitsProps {
 
 const InputBenefits: FC<InputBenefitsProps> = ({ form }) => {
   const [benefits, setBenefits] = useState<any[]>([]);
+  const { toast } = useToast();
 
   const deleteBenefit = (item: any) => {
     const deletedBenefits = benefits.filter(
@@ -16,6 +18,10 @@ const InputBenefits: FC<InputBenefitsProps> = ({ form }) => {
     );
     setBenefits([...deletedBenefits]);
     form.setValue("benefits", deletedBenefits);
+    toast({
+      description: "Benefit deleted successfully",
+    })
+
   };
 
   const updateBenefits = (item: any) => {
